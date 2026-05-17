@@ -296,10 +296,10 @@ GITHUB_TOKEN=$(cat ~/.contribution-ledger/config.json | jq -r .github.token)
 ## Tech Stack
 
 **CLI:**
-- **Language:** Node.js (TypeScript) or Go
-  - Node: Better integration with Claude API, faster to prototype
-  - Go: Faster, smaller binary, easier distribution
-  - Recommendation: **Node/TypeScript** for v1, can be rewritten in Go later
+- **Language:** Go
+  - Faster execution, smaller binary
+  - Easy distribution (single executable)
+  - Better for CLI tools
 - **Dependencies:**
   - `@azure/identity` or `az CLI` for ADO auth
   - `@anthropic-ai/sdk` for Claude summarization

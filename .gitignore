@@ -1,0 +1,25 @@
+*.swp
+*.swo
+*~
+.DS_Store
+/.idea
+/.vscode
+/bin/
+/dist/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Build output
+contribution-ledger
+
+# Temp files
+scan-results.json
+
+# Go
+vendor/
+go.sum
+
+# Config
+.contribution-ledger/

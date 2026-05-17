@@ -29,6 +29,11 @@ type Config struct {
 		CompanyName  string            `json:"companyName"`
 		StripFileNames bool            `json:"stripFileNames"`
 	} `json:"anonymization"`
+
+	AI struct {
+		Provider string `json:"provider"` // "copilot" or "claude"
+		APIKey   string `json:"apiKey"`   // For Claude or other providers
+	} `json:"ai"`
 }
 
 var (
@@ -96,5 +101,6 @@ func Default() *Config {
 	cfg.Anonymization.CompanyName = "Work"
 	cfg.Anonymization.ProjectNames = make(map[string]string)
 	cfg.Anonymization.StripFileNames = true
+	cfg.AI.Provider = "copilot" // Default to Copilot
 	return cfg
 }

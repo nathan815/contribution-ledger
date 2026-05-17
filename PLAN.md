@@ -12,7 +12,7 @@
 │  - Scan local git repos                                          │
 │  - Query ADO (via `az`) for PRs, code reviews                   │
 │  - Extract commit stats, review metrics                          │
-│  - AI summarization (Claude)                                     │
+│  - AI summarization (Copilot SDK / Claude)                      │
 │  - Anonymize sensitive data                                      │
 │  - Generate JSON output                                          │
 └────────────────────┬────────────────────────────────────────────┘
@@ -76,7 +76,7 @@ contribution-ledger ado-pull-requests [--project "Project Alpha"]
 ### 4. AI Summarize
 ```bash
 contribution-ledger summarize
-# Passes commit/PR data to Claude API
+# Passes commit/PR data to Copilot SDK (Claude)
 # Generates high-level summaries like:
 #  - "Built authentication service (Go, TypeScript), 145 commits over 2 months"
 #  - "Led code reviews on performance improvements, 38 PRs reviewed"
@@ -124,6 +124,10 @@ contribution-ledger push --repo contribution-ledger-data
     },
     "companyName": "Work",
     "stripFileNames": true
+  },
+  "ai": {
+    "provider": "copilot",
+    "apiKey": ""
   }
 }
 ```
@@ -157,57 +161,23 @@ contribution-ledger push --repo contribution-ledger-data
       "aiSummary": "Built distributed authentication service with OAuth2 support. Implemented caching layer (Redis), optimized database queries, reduced auth latency by 40%.",
       "technologies": ["Go", "PostgreSQL", "Redis", "Kubernetes"],
       "impact": "Improved login reliability from 98% to 99.9% uptime"
-    },
-    {
-      "id": "project-beta-migrations",
-      "name": "Project Beta",
-      "company": "Work",
-      "period": "2025-08 to 2025-10",
-      "type": "infrastructure",
-      "stats": {
-        "commits": 156,
-        "filesChanged": 45,
-        "frequency": "8-12 commits/week",
-        "languages": ["Go", "Terraform"],
-        "primaryLanguage": "Terraform"
-      },
-      "aiSummary": "Led infrastructure migration from legacy datacenter to Kubernetes. Designed multi-region failover strategy.",
-      "technologies": ["Terraform", "Kubernetes", "AWS"]
     }
   ],
   "codeReviews": {
     "totalReviewed": 156,
     "totalComments": 892,
     "averageCommentsPerPR": 5.7,
-    "feedbackTypes": {
-      "approved": 78,
-      "requestedChanges": 42,
-      "commented": 36
-    },
     "highlights": [
       {
         "date": "2026-04-15",
         "project": "Project Alpha",
-        "type": "Performance review",
-        "summary": "Reviewed critical database optimization PR. Suggested indexes on hot tables, reducing query time by 60%."
-      },
-      {
-        "date": "2026-03-22",
-        "project": "Project Beta",
-        "type": "Architecture review",
-        "summary": "Reviewed service mesh migration proposal. Provided feedback on observability patterns."
+        "summary": "Reviewed critical database optimization PR. Suggested indexes, reducing query time by 60%."
       }
     ]
   },
   "timeline": {
-    "2026-05": { "commits": 87, "prsReviewed": 12, "focus": ["Project Alpha"] },
-    "2026-04": { "commits": 156, "prsReviewed": 18, "focus": ["Project Alpha", "Project Beta"] },
-    "2026-03": { "commits": 203, "prsReviewed": 24, "focus": ["Project Alpha"] }
-  },
-  "skills": {
-    "languages": ["Go", "TypeScript", "Python", "Terraform"],
-    "platforms": ["Kubernetes", "AWS", "PostgreSQL", "Redis"],
-    "practices": ["Code Review", "Architecture Design", "Performance Optimization"]
+    "2026-05": { "commits": 87, "prsReviewed": 12 },
+    "2026-04": { "commits": 156, "prsReviewed": 18 }
   }
 }
 ```
@@ -252,10 +222,12 @@ curl -H "Authorization: Bearer $TOKEN" \
   https://dev.azure.com/{org}/_apis/git/repositories
 ```
 
-### GitHub (Token in config, or prompt)
+### Copilot SDK (GitHub authentication)
+
 ```bash
-# Optional: Store GitHub token in config for private repos
-GITHUB_TOKEN=$(cat ~/.contribution-ledger/config.json | jq -r .github.token)
+# Use GitHub token from config or environment
+# SDK handles authentication automatically
+# Falls back to Claude SDK if Copilot not available
 ```
 
 ---
@@ -274,7 +246,7 @@ GITHUB_TOKEN=$(cat ~/.contribution-ledger/config.json | jq -r .github.token)
    → Merges with commit data
 
 3. User runs: contribution-ledger summarize
-   → Calls Claude: "Summarize this work in one sentence: 347 commits in Go, focused on auth..."
+   → Calls Copilot SDK: "Summarize this work in one sentence: 347 commits in Go..."
    → Returns: "Built authentication service with OAuth2 support..."
    → Generates: projects[].aiSummary
 
@@ -295,56 +267,57 @@ GITHUB_TOKEN=$(cat ~/.contribution-ledger/config.json | jq -r .github.token)
 
 ## Tech Stack
 
-**CLI:**
-- **Language:** Go
-  - Faster execution, smaller binary
-  - Easy distribution (single executable)
-  - Better for CLI tools
-- **Dependencies:**
-  - `@azure/identity` or `az CLI` for ADO auth
-  - `@anthropic-ai/sdk` for Claude summarization
-  - `simple-git` for git operations
-  - `commander` for CLI
-  - `fs-extra` for file ops
+**Language:** Go 1.21+
+- Faster execution, smaller binary
+- Easy distribution (single executable)
+- Better for CLI tools
 
-**Data Repo:**
-- Plain Git repo with JSON + HTML
-- GitHub Pages for website
-- GitHub Actions for optional auto-refresh
+**Dependencies:**
+- `github.com/go-git/go-git/v5` — Git operations
+- `github.com/spf13/cobra` — CLI framework
+- `github.com/mitchellh/go-homedir` — Cross-platform paths
+- `github.com/Azure/azure-sdk-for-go/sdk/identity` — ADO OAuth
+- **`github.com/copilot-sdk/go-copilot`** — Claude API via GitHub Copilot (default)
+- `github.com/anthropic-ai/sdk-go` — Claude API (optional fallback)
 
 **Website:**
 - Vanilla JS (load repos.json, render)
-- Or React for more interactivity
 - Terminal theme (consistent with repos-portfolio)
+- GitHub Pages deployment
 
 ---
 
 ## Implementation Phases
 
-### Phase 1: MVP (Local Scanning + Anonymization)
-- [ ] Project setup (package.json, tsconfig, etc.)
-- [ ] CLI scaffolding (commander)
-- [ ] Config file structure
-- [ ] Git scanning logic
-- [ ] Anonymization module
-- [ ] Save to JSON
+### Phase 1: MVP (Local Scanning + Anonymization) ✅
+- [x] Project setup (Go module, structure)
+- [x] CLI scaffolding (Cobra)
+- [x] Config file system
+- [x] Git scanning logic
+- [x] Anonymization framework
+- [x] Save to JSON
+- Tests: 9 passing
 
-### Phase 2: ADO Integration
-- [ ] `az` CLI auth
-- [ ] ADO REST API wrapper
-- [ ] PR/review querying
-- [ ] Code review stats extraction
-- [ ] Merge with scan data
+### Phase 2: ADO Integration ✅
+- [x] `az` CLI auth
+- [x] ADO REST API client
+- [x] PR/review querying
+- [x] Code review stats extraction
+- [x] Concurrent API calls
+- [x] Merge with scan data
+- Tests: 11 passing, 9% coverage
 
-### Phase 3: AI Summarization
-- [ ] Claude API integration
+### Phase 3: AI Summarization (IN PROGRESS)
+- [ ] Copilot SDK integration
 - [ ] Prompt engineering for sanitized summaries
 - [ ] Batch summarization
 - [ ] Error handling/retries
+- [ ] Claude SDK as fallback option
 
 ### Phase 4: Portfolio Push
-- [ ] Create commits with realistic timestamps
-- [ ] Push to data repo
+- [ ] Git commit generation with real timestamps
+- [ ] Data repo management
+- [ ] Contribution graph population
 - [ ] GitHub Pages setup
 
 ### Phase 5: Website
@@ -356,19 +329,23 @@ GITHUB_TOKEN=$(cat ~/.contribution-ledger/config.json | jq -r .github.token)
 
 ### Phase 6: Polish + Open Source
 - [ ] Documentation
-- [ ] Tests
+- [ ] Full test suite
 - [ ] Example config
-- [ ] Publish to npm/GitHub
+- [ ] Publish releases
 
 ---
 
 ## Next Steps
 
-1. Confirm tech stack (Node.js TypeScript?)
-2. Confirm data repo name (`contribution-ledger-data`?)
-3. Start Phase 1: scaffolding + config + git scanning
+1. ✅ Phase 1 complete
+2. ✅ Phase 2 complete
+3. → Phase 3: Copilot SDK summarization
+4. → Phase 4: Portfolio push
+5. → Phase 5: Website
+6. → Phase 6: Polish
 
 ---
 
 **Created:** May 17, 2026
-**Status:** Planning
+**Updated:** May 17, 2026 (Phases 1-2 complete, Copilot SDK default)
+**Status:** Building Phase 3

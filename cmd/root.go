@@ -16,7 +16,8 @@ Usage:
   contribution-ledger scan                        - Scan local git repos
   contribution-ledger ado-pull-requests          - Fetch ADO PR/review data
   contribution-ledger summarize                  - AI-summarize contributions
-  contribution-ledger push                       - Push to portfolio repo`,
+  contribution-ledger push                       - Push to portfolio repo
+  contribution-ledger website                    - Generate portfolio website`,
 		Version: "0.1.0",
 	}
 
@@ -25,6 +26,7 @@ Usage:
 	cmd.AddCommand(newAdoCmd())
 	cmd.AddCommand(newSummarizeCmd())
 	cmd.AddCommand(newPushCmd())
+	cmd.AddCommand(newWebsiteCmd())
 
 	return cmd
 }
@@ -82,4 +84,14 @@ func newPushCmd() *cobra.Command {
 	}
 	cmd.Flags().String("repo", "", "Path to portfolio repo (from config by default)")
 	return cmd
+}
+
+func newWebsiteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "website",
+		Short: "Generate portfolio website HTML",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return generateWebsite()
+		},
+	}
 }

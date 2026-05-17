@@ -2,12 +2,7 @@ package cmd
 
 import "fmt"
 
-// Phase 2+ implementations (stubs for now)
-
-func fetchAdoData() error {
-	fmt.Println("⏳ Coming in Phase 2: ADO integration")
-	return nil
-}
+// Phase 3-4 implementations (stubs for now)
 
 func summarizeContributions() error {
 	fmt.Println("⏳ Coming in Phase 3: Claude AI summarization")

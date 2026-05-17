@@ -15,7 +15,7 @@ func initConfig() error {
 	reader := bufio.NewReader(os.Stdin)
 	
 	fmt.Println("\n📊 Contribution Ledger Configuration")
-	fmt.Println("=====================================\n")
+	fmt.Println("=====================================")
 	
 	// ADO Organization
 	fmt.Print("Azure DevOps Organization URL (e.g., dev.azure.com/your-org): ")

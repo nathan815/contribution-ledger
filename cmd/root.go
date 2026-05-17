@@ -83,24 +83,3 @@ func newPushCmd() *cobra.Command {
 	cmd.Flags().String("repo", "", "Path to portfolio repo (from config by default)")
 	return cmd
 }
-
-// Stub implementations for Phase 1
-func initConfig() error {
-	return nil
-}
-
-func scanRepos() error {
-	return nil
-}
-
-func fetchAdoData() error {
-	return nil
-}
-
-func summarizeContributions() error {
-	return nil
-}
-
-func pushPortfolio() error {
-	return nil
-}

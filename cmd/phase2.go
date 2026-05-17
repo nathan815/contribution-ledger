@@ -1,13 +1,8 @@
 package cmd
 
-import (
-	"fmt"
-	"os"
+import "fmt"
 
-	"github.com/spf13/cobra"
-)
-
-// Stub implementations for Phase 2+
+// Phase 2+ implementations (stubs for now)
 
 func fetchAdoData() error {
 	fmt.Println("⏳ Coming in Phase 2: ADO integration")
@@ -21,11 +16,5 @@ func summarizeContributions() error {
 
 func pushPortfolio() error {
 	fmt.Println("⏳ Coming in Phase 4: Push to portfolio repo")
-	return nil
-}
-
-// Placeholder for future GitHub integration
-func fetchGitHubData() error {
-	fmt.Println("⏳ Coming in Phase 2b: GitHub private repo integration")
 	return nil
 }

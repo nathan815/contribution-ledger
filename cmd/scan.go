@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/nathan815/contribution-ledger/internal/config"
 	gitpkg "github.com/nathan815/contribution-ledger/internal/git"
 )
